@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <context:annotation-config/>
+    <!--配置调度器工厂 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序-->
+    <bean id="schedule" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false">
+        <!-- 触发器列表 -->
+        <property name="triggers">
+            <list>
+                <ref bean="daily_test"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+    &lt;!&ndash; 配置调度器工厂 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序 &ndash;&gt;
+    <bean id="schedulerFactory" class="com.shier.schdule.util.HostnameSchedulerFactoryBean" lazy-init="false">
+        <property name="hosts">
+            <list>
+                &lt;!&ndash; 服务器ip&ndash;&gt;
+                <value>192.168.1.100</value>
+            </list>
+        </property>
+        &lt;!&ndash; 触发器列表 &ndash;&gt;
+        <property name="triggers">
+            <list>
+                <ref bean="daily_test"/>
+            </list>
+        </property>
+    </bean>-->
+
+    <!--测试，每10秒执行一次-->
+    <bean id="daily_test" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="dailyTest"/>
+        <!-- cron表达式 -->
+        <property name="cronExpression" value="*/10 * * * * ?"/>
+    </bean>
+    <!-- 定义调用对象和调用对象的方法 -->
+    <bean id="dailyTest" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 调用的类 -->
+        <property name="targetObject" ref="schduleTest"/>
+        <!-- 调用类中的方法 -->
+        <property name="targetMethod" value="startTset"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+</beans>
